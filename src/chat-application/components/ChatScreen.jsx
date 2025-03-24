@@ -3,9 +3,12 @@ import { FaRegPaperPlane } from "react-icons/fa";
 import profile1 from "../assets/profile1.jpg";
 import profile2 from "../assets/profile2.jpg";
 import { io } from "socket.io-client";
+import { joinChat, receiveMessage, sendMessage } from "../../utils/socket";
 
 const ChatScreen = () => {
-  const [socket, setSocket] = useState(null);
+  const [userId, setUserId] = useState(12);
+  const [socket, setSocket] = useState();
+  const [roomId, setRoomId] = useState(1);
   const senderChats = [
     {
       name: "Bill Kuphal",
@@ -70,33 +73,36 @@ const ChatScreen = () => {
   ];
 
   const createConnection = () => {
-    const newSocket = io.connect("http://localhost:3001");
+    const newSocket = io.connect("http://localhost:3000");
     setSocket(newSocket);
     console.log("Socket connected:", newSocket);
   };
 
-  //   useEffect(() => {
-  //     const newSocket = io("http://localhost:9000", {
-  //       transports: ["websocket", "polling"], // Ensures proper transport method
-  //     });
+  const hanldeSendMessage = () => {
+    const messageData = {
+      senderId: 13,
+      receiverId: 12,
+      roomId,
+      message: "Hello, how are you?",
+    };
+    sendMessage(socket, messageData, roomId);
+    receiveMessage(socket, (message) => {
+      console.log(message, "received message");
+    });
+  };
 
-  //     setSocket(newSocket);
+  useEffect(() => {
+    createConnection();
+  }, []);
 
-  //     newSocket.on("connect", () => {
-  //       console.log("Connected to WebSocket server");
-  //     });
-
-  //     // newSocket.on("disconnect", () => {
-  //     //   console.log("Disconnected from WebSocket server");
-  //     // });
-
-  //     // return () => {
-  //     //   newSocket.disconnect();
-  //     // };
-  //   }, []);
+  useEffect(() => {
+    if (socket) {
+      joinChat(socket, userId, roomId);
+    }
+  }, [socket, userId, roomId]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 w-full">
+    <div className="flex flex-col h-full bg-gray-100 w-full">
       <div className="flex items-center p-4 bg-white shadow-md">
         <img
           src={profile1}
@@ -142,7 +148,7 @@ const ChatScreen = () => {
         />
         <button
           className="ml-2 bg-blue-500 text-white p-3 rounded-lg"
-          onClick={createConnection}
+          onClick={hanldeSendMessage}
         >
           <FaRegPaperPlane />
         </button>

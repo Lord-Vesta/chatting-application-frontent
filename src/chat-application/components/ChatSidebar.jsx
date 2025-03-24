@@ -44,7 +44,7 @@ const ChatSidebar = () => {
   ];
 
   return (
-    <div className="w-80 h-screen bg-white shadow-md border-r">
+    <div className="w-80 h-full bg-white shadow-md border-r">
       <div className="flex items-center p-3 border-b">
         <button className="p-2">
           <span className="material-icons">menu</span>
